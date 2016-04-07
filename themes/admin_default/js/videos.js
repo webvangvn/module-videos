@@ -314,6 +314,20 @@ function get_alias(mod, id) {
 	return false;
 }
 
+function get_duration(mod) {
+	var path = strip_tags(document.getElementById('vid_path').value);
+	if (path != '') {
+		$.post(script_name + '?' + nv_name_variable + '=' + nv_module_name + '&' + nv_fc_variable + '=vid_info&nocache=' + new Date().getTime(), 'vid_path=' + path + '&mod=' + mod, function(res) {
+			if (res != "") {
+				document.getElementById('vid_duration').value = res;
+			} else {
+				document.getElementById('vid_duration').value = '';
+			}
+		});
+	}
+	return false;
+}
+
 function nv_search_tag(tid) {
 	$("#module_show_list").html('<p class="text-center"><img src="' + nv_base_siteurl + 'assets/images/load_bar.gif" alt="Waiting..."/></p>').load(script_name + "?" + nv_lang_variable + "=" + nv_lang_data + "&" + nv_name_variable + "=" + nv_module_name + "&" + nv_fc_variable + "=tags&q=" + rawurlencode($("#q").val()) + "&num=" + nv_randomPassword(10));
 	return false;

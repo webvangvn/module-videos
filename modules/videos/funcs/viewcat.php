@@ -38,7 +38,7 @@ if( ! defined( 'NV_IS_MODADMIN' ) and $page < 5 )
 	{
 		$cache_file = NV_LANG_DATA . '_' . $module_info['template'] . '_' . $op . '_' . $catid . '_' . $page . '_' . NV_CACHE_PREFIX . '.cache';
 	}
-	if( ( $cache = nv_get_cache( $module_name, $cache_file ) ) != false )
+	if( ( $cache = $nv_Cache->getItem( $module_name, $cache_file ) ) != false )
 	{
 		$contents = $cache;
 	}
@@ -87,7 +87,7 @@ if( empty( $contents ) )
 		{
 			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['imghome'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['imghome'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 ) //image url
 			{
@@ -109,7 +109,9 @@ if( empty( $contents ) )
 			}
 			else
 			{
-				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['admin_name'] ;
+				$item['upload_alias'] = change_alias(  $item['admin_name']  );
+				$item['upload_alias'] = strtolower( $item['upload_alias'] );
+				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['upload_alias'] . '-' . $item['admin_id'];
 			}
 			$array_catpage[] = $item;
 			$end_publtime = $item['publtime'];
@@ -164,7 +166,7 @@ if( empty( $contents ) )
 		{
 			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['imghome'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['imghome'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 ) //image url
 			{
@@ -184,7 +186,9 @@ if( empty( $contents ) )
 			}
 			else
 			{
-				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['admin_name'] ;
+				$item['upload_alias'] = change_alias(  $item['admin_name']  );
+				$item['upload_alias'] = strtolower( $item['upload_alias'] );
+				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['upload_alias'] . '-' . $item['admin_id'];
 			}
 			$item['newday'] = $global_array_cat[$catid]['newday'];
 			$item['link'] = $global_array_cat[$catid]['link'] . '/' . $item['alias'] . '-' . $item['id'] . $global_config['rewrite_exturl'];
@@ -212,7 +216,7 @@ if( empty( $contents ) )
 				{
 					if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 					{
-						$item['imghome'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+						$item['imghome'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 					}
 					elseif( $item['homeimgthumb'] == 3 ) //image url
 					{
@@ -262,7 +266,7 @@ if( empty( $contents ) )
 		{
 			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['imghome'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['imghome'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 ) //image url
 			{
@@ -282,7 +286,9 @@ if( empty( $contents ) )
 			}
 			else
 			{
-				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['admin_name'] ;
+				$item['upload_alias'] = change_alias(  $item['admin_name']  );
+				$item['upload_alias'] = strtolower( $item['upload_alias'] );
+				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['upload_alias'] . '-' . $item['admin_id'];
 			}
 			$item['newday'] = $global_array_cat[$catid]['newday'];
 			$item['link'] = $global_array_cat[$catid]['link'] . '/' . $item['alias'] . '-' . $item['id'] . $global_config['rewrite_exturl'];
@@ -296,7 +302,7 @@ if( empty( $contents ) )
 
 	if( ! defined( 'NV_IS_MODADMIN' ) and $contents != '' and $cache_file != '' )
 	{
-		nv_set_cache( $module_name, $cache_file, $contents );
+		$nv_Cache->setItem( $module_name, $cache_file, $contents );
 	}
 }
 

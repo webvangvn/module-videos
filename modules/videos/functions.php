@@ -40,7 +40,7 @@ $alias_cat_url = isset( $array_op[0] ) ? $array_op[0] : '';
 $array_mod_title = array();
 
 $sql = 'SELECT * FROM ' . NV_PREFIXLANG . '_' . $module_data . '_cat ORDER BY sort ASC';
-$list = nv_db_cache( $sql, 'catid', $module_name );
+$list = $nv_Cache->db( $sql, 'catid', $module_name );
 foreach( $list as $l )
 {
 	$global_array_cat[$l['catid']] = $l;
@@ -55,7 +55,7 @@ unset( $sql, $list );
 
 $global_array_block = array();
 $sql = 'SELECT bid, title, alias FROM ' . NV_PREFIXLANG . '_' . $module_data . '_block_cat ORDER BY alias ASC';
-$list = nv_db_cache( $sql, 'bid', $module_name );
+$list = $nv_Cache->db( $sql, 'bid', $module_name );
 foreach( $list as $l )
 {
 	$global_array_block[$l['bid']] = $l;

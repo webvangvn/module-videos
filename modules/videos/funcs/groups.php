@@ -68,7 +68,7 @@ if( isset( $array_op[1] ) )
 		{
 			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['src'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['src'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 )//image url
 			{
@@ -93,7 +93,9 @@ if( isset( $array_op[1] ) )
 			}
 			else
 			{
-				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['admin_name'] ;
+				$item['upload_alias'] = change_alias(  $item['admin_name']  );
+				$item['upload_alias'] = strtolower( $item['upload_alias'] );
+				$item['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $item['upload_alias'] . '-' . $item['admin_id'];
 			}
 
 			$end_weight = $item['weight'];
@@ -134,64 +136,60 @@ if( isset( $array_op[1] ) )
 else
 {
 	$array_cat = array();
-	$key = 0;
-
-	$query_cat = $db->query( 'SELECT bid, numbers, title, alias FROM ' . NV_PREFIXLANG . '_' . $module_data . '_block_cat ORDER BY weight ASC' );
-
-	while( list( $bid, $numberlink, $btitle, $balias ) = $query_cat->fetch( 3 ) )
+	$groups_info = '';
+	$groups_info['title'] = $lang_module['groups_show_list'];
+	
+	// cache call
+	$cache_file = NV_LANG_DATA . '_' . $module_name . '_' . $op . '_' .  md5( $op ) .'_' . NV_CACHE_PREFIX . '.cache';
+	if( ! defined( 'NV_IS_MODADMIN' ) )
 	{
-		$array_cat[$key] = array(
-			'catid' => $bid,
-			'alias' => '',
-			'subcatid' => '',
-			'title' => $btitle,
-			'link' => NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=' . $module_info['alias']['groups'] . '/' . $balias
-		);
-
-		$db->sqlreset()
-			->select( 't1.id, t1.catid, t1.admin_id, t1.admin_name, t1.author, t1.sourceid, t1.addtime, t1.edittime, t1.publtime, t1.title, t1.alias, t1.hometext, t1.homeimgfile, t1.homeimgalt, t1.homeimgthumb, t1.allowed_rating, t1.hitstotal, t1.hitscm, t1.total_rating, t1.click_rating' )
-			->from( NV_PREFIXLANG . '_' . $module_data . '_rows t1' )
-			->join( 'INNER JOIN ' . NV_PREFIXLANG . '_' . $module_data . '_block t2 ON t1.id = t2.id' )
-			->where( 't2.bid= ' . $bid . ' AND t1.status= 1' )
-			->order( 't2.weight ASC' )
-			->limit( $numberlink );
-		$result = $db->query( $db->sql() );
-		while( $item = $result->fetch() )
+		if( ( $cache = $nv_Cache->getItem( $module_name, $cache_file ) ) != false )
 		{
-			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
+			$time_set_cache = NV_CURRENTTIME - filemtime( NV_ROOTDIR . '/' . NV_CACHEDIR .'/'. $module_name . '/' . $cache_file);
+			$contents = $cache;
+		}
+	}
+	if( empty( $contents )  )
+	{
+		$query_cat = $db->query( 'SELECT bid as id, title, alias, image, description, weight FROM ' . NV_PREFIXLANG . '_' . $module_data . '_block_cat ORDER BY weight ASC' );
+
+		while( $item = $query_cat->fetch() )
+		{
+			if( ! empty( $item['image'] ) AND file_exists( NV_ROOTDIR. '/' . NV_UPLOADS_DIR . '/' . $module_upload . '/img/' . $item['image'] ) )//image file
 			{
-				$item['imghome'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['src'] = videos_thumbs($item['id'], $item['image'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
-			elseif( $item['homeimgthumb'] == 3 )//image url
+			elseif(nv_is_url($item['image']))
 			{
-				$item['imghome'] = $item['homeimgfile'];
+				$item['src'] = $item['image'];
 			}
 			elseif( ! empty( $show_no_image ) )//no image
 			{
-				$item['imghome'] = NV_BASE_SITEURL . $show_no_image;
+				$item['src'] = NV_BASE_SITEURL . $show_no_image;
 			}
 			else
 			{
-				$item['imghome'] = '';
+				$item['src'] = '';
 			}
+			$item['alt'] = $item['title'];
+			$item['width'] = $module_config[$module_name]['blockwidth'];
 
-			$item['alt'] = ! empty( $item['homeimgalt'] ) ? $item['homeimgalt'] : $item['title'];
-			$item['width'] = $module_config[$module_name]['homewidth'];
-
-			$item['link'] = $global_array_cat[$item['catid']]['link'] . '/' . $item['alias'] . '-' . $item['id'];
-			$array_cat[$key]['content'][] = $item;
+			$item['link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=' . $module_info['alias']['groups'] . '/' . $item['alias'];
+			$item['publtime'] = 0;
+			
+			$array_cat[] = $item;
 		}
-		++$key;
+		
+		$query_cat->closeCursor();
+		unset( $query_cat, $item );
+		
+		$contents = playlist_theme( $array_cat, '', '', $groups_info, '','' );
+
+		if( ! defined( 'NV_IS_MODADMIN' ) and $contents != '' and $cache_file != '' )
+		{
+			$nv_Cache->setItem( $module_name, $cache_file, $contents );
+		}
 	}
-
-	$viewcat = $module_config[$module_name]['indexfile'];
-
-	if( $viewcat != 'viewcat_main_left' and $viewcat != 'viewcat_main_bottom' )
-	{
-		$viewcat == 'viewcat_main_right';
-	}
-
-	$contents = viewsubcat_main( $viewcat, $array_cat );
 
 	$page_title = $module_info['funcs']['groups']['func_custom_name'];
 	$key_words = $module_info['keywords'];

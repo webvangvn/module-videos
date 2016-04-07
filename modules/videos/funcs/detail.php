@@ -182,7 +182,9 @@ if( nv_user_in_groups( $global_array_cat[$catid]['groups_view'] ) )
 	}
 	else
 	{
-		$news_contents['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $news_contents['admin_name'] ;
+		$news_contents['upload_alias'] = change_alias(  $news_contents['admin_name']  );
+		$news_contents['upload_alias'] = strtolower( $news_contents['upload_alias'] );
+		$news_contents['uploader_link'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $news_contents['upload_alias'] . '-' . $news_contents['admin_id'];
 	}
 			
 	if( $module_config[$module_name]['config_source'] == 0 ) $news_contents['source'] = $sourcetext;
@@ -205,7 +207,7 @@ if( nv_user_in_groups( $global_array_cat[$catid]['groups_view'] ) )
 		{
 			if( $row['homeimgthumb'] == 1 OR $row['homeimgthumb'] == 2 ) //image file
 			{
-				$row['imghome'] = creat_thumbs($row['id'], $row['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$row['imghome'] = videos_thumbs($row['id'], $row['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $row['homeimgthumb'] == 3 ) //image url
 			{
@@ -246,7 +248,7 @@ if( nv_user_in_groups( $global_array_cat[$catid]['groups_view'] ) )
 		{
 			if( $row['homeimgthumb'] == 1 OR $row['homeimgthumb'] == 2 ) //image file
 			{
-				$row['imghome'] = creat_thumbs($row['id'], $row['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$row['imghome'] = videos_thumbs($row['id'], $row['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $row['homeimgthumb'] == 3 ) //image url
 			{
@@ -336,8 +338,9 @@ if( nv_user_in_groups( $global_array_cat[$catid]['groups_view'] ) )
 		$content_comment = '';
 	}
 	
+	$array_user_playlist = array();
 	// call user playlist
-	if( $user_info['userid'] > 0)
+	if( isset($user_info['userid']) AND $user_info['userid'] > 0)
 	{
 		$sql = 'SELECT playlist_id, title, status FROM ' . NV_PREFIXLANG . '_' . $module_data . '_playlist_cat WHERE userid=' . $user_info['userid'] . ' AND status > 0 ORDER BY weight ASC';
 		$array_user_playlist = $db->query( $sql )->fetchAll();

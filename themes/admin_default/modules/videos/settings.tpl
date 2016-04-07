@@ -8,13 +8,12 @@
 	
 	<div class="table-responsive">
 		<table class="table table-striped table-bordered table-hover">
-			<caption><em class="fa fa-file-text-o">&nbsp;</em>{LANG.setting_player} Cấu hình trình phát</caption>
+			<caption><em class="fa fa-file-text-o">&nbsp;</em>{LANG.setting_player}</caption>
 			<tbody>
 				<tr>
-					<th>{LANG.setting_jwplayer_license}</th>
-					<td><input class="form-control" style="width:340px;" name="jwplayer_license" value="{DATA.jwplayer_license}" type="text"/><span class="text-middle">{LANG.jwplayer_license_note} Ghi chú</span></td>
-				</tr>
-				
+					<th id="jwplayer_license">{LANG.setting_jwplayer_license}</th>
+					<td><input class="form-control" style="width:340px;" name="jwplayer_license" value="{DATA.jwplayer_license}" type="text"/><span class="text-middle"><br/>{LANG.wiki_get_free_jwlicense}</span></td>
+				</tr>			
 				<tr>
 					<th>{LANG.setting_jwplayer_autoplay}</th>
 					<td>
@@ -209,6 +208,10 @@
 				<tr>
 					<th>{LANG.facebookAppID}</th>
 					<td><input class="form-control w150" name="facebookappid" value="{DATA.facebookappid}" type="text"/><span class="text-middle">{LANG.facebookAppIDNote}</span></td>
+				</tr>
+				<tr>
+					<th>{LANG.setting_youtube_api}</th>
+					<td><input class="form-control" style="width:340px;" name="youtube_api" value="{DATA.youtube_api}" type="text"/><span class="text-middle"><br/>{LANG.wiki_get_free_youtube_api}</span></td>
 				</tr>
 				<tr>
 					<th>{LANG.setting_alias_lower}</th>

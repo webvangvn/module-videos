@@ -39,6 +39,7 @@ if( ! empty( $savesetting ) )
 	$array_config['playlist_allow_detele'] = $nv_Request->get_int( 'playlist_allow_detele', 'post', 0 );
 	$array_config['playlist_max_items'] = $nv_Request->get_title( 'playlist_max_items', 'post', '', 0 );
 	
+	$array_config['youtube_api'] = $nv_Request->get_title( 'youtube_api', 'post', '' );
 	$array_config['jwplayer_license'] = $nv_Request->get_title( 'jwplayer_license', 'post', '' );
 	$array_config['jwplayer_autoplay'] = $nv_Request->get_title( 'jwplayer_autoplay', 'post', 0 );
 	$array_config['jwplayer_loop'] = $nv_Request->get_title( 'jwplayer_loop', 'post', '', 0 );
@@ -86,8 +87,8 @@ if( ! empty( $savesetting ) )
 		$sth->execute();
 	}
 
-	nv_del_moduleCache( 'settings' );
-	nv_del_moduleCache( $module_name );
+	$nv_Cache->delMod( 'settings' );
+	$nv_Cache->delMod( $module_name );
 	Header( 'Location: ' . NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass() );
 	die();
 }
@@ -316,8 +317,8 @@ if( defined( 'NV_IS_ADMIN_FULL_MODULE' ) or ! in_array( 'admins', $allow_func ) 
 			}
 		}
 
-		nv_del_moduleCache( 'settings' );
-		nv_del_moduleCache( $module_name );
+		$nv_Cache->delMod( 'settings' );
+		$nv_Cache->delMod( $module_name );
 		Header( 'Location: ' . NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&rand=' . nv_genpass() );
 		die();
 	}

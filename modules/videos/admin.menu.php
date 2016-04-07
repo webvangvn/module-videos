@@ -74,7 +74,7 @@ else
 	}
 }
 
-$allow_func = array( 'main', 'view', 'stop', 'publtime', 'waiting', 'declined', 're-published', 'content', 'rpc', 'del_content', 'alias', 'playlistajax', 'sourceajax', 'tagsajax' );
+$allow_func = array( 'main', 'view', 'stop', 'publtime', 'waiting', 'declined', 're-published', 'content', 'rpc', 'del_content', 'alias', 'vid_info', 'playlistajax', 'sourceajax', 'tagsajax' );
 
 if( ! isset( $site_mods['cms'] ) )
 {
@@ -123,3 +123,8 @@ if( $NV_IS_ADMIN_MODULE )
 	$allow_func[] = 'setting';
 	$allow_func[] = 'move';
 }
+
+$array_url_instruction['content'] = 'https://github.com/anhyeuviolet/module-videos/wiki/Module-Videos---NukeViet-4.x#c%C3%A1c-%C4%91%E1%BB%8Bnh-d%E1%BA%A1ng---li%C3%AAn-k%E1%BA%BFt-h%E1%BB%97-tr%E1%BB%A3';
+$array_url_instruction['setting'] = 'https://github.com/anhyeuviolet/module-videos/wiki/Module-Videos---NukeViet-4.x';
+$array_url_instruction['playlists'] = 'https://github.com/anhyeuviolet/module-videos/wiki/Module-Videos---NukeViet-4.x#m%E1%BB%99t-s%E1%BB%91-ch%E1%BB%A9c-n%C4%83ng-h%E1%BB%97-tr%E1%BB%A3';
+$array_url_instruction['groups'] = 'https://github.com/anhyeuviolet/module-videos/wiki/Module-Videos---NukeViet-4.x#m%E1%BB%99t-s%E1%BB%91-ch%E1%BB%A9c-n%C4%83ng-h%E1%BB%97-tr%E1%BB%A3';

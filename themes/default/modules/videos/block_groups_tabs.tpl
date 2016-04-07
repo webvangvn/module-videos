@@ -1,7 +1,7 @@
 <!-- BEGIN: main -->
 <ul class="nav nav-tabs">
   <li class="active"><a data-toggle="tab" href="#block-news-groups">{BLOCK_NAME}</a></li>
-  <li><a data-toggle="tab" href="#latest-news">Tin mới nhất</a></li>
+  <li><a data-toggle="tab" href="#latest-news">Videos mới nhất</a></li>
 </ul>
 
 <div class="tab-content">
@@ -10,7 +10,7 @@
 		<!-- BEGIN: loop -->
 		<li class="list-group-item">
 			<!-- BEGIN: img -->
-			<a href="{ROW.link}" title="{ROW.title}"><img src="{ROW.thumb}" alt="{ROW.title}" width="{ROW.blockwidth}" class="img-thumbnail"/></a>
+			<a href="{ROW.link}" title="{ROW.title}"><img src="{ROW.thumb}" alt="{ROW.title}" width="100" class="img-thumbnail"/></a>
 			<!-- END: img -->
 			<a href="{ROW.link}" title="{ROW.title}">{ROW.title}</a>
 		</li>
@@ -23,7 +23,7 @@
 		<!-- BEGIN: loop -->
 		<li class="list-group-item">
 			<!-- BEGIN: img -->
-			<a href="{NEWS.link}" title="{NEWS.title}"><img src="{NEWS.thumb}" alt="{NEWS.title}" width="{NEWS.blockwidth}" class="img-thumbnail"/></a>
+			<a href="{NEWS.link}" title="{NEWS.title}"><img src="{NEWS.thumb}" alt="{NEWS.title}" width="100" class="img-thumbnail"/></a>
 			<!-- END: img -->
 			<a href="{NEWS.link}" title="{NEWS.title}">{NEWS.title}</a>
 		</li>

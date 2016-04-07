@@ -16,10 +16,18 @@
 			</ul>
 		</div>
 		<div class="detail_video">
+			<!-- BEGIN: no_jwp_lic_admin -->
+			<div class="alert alert-warning"><a href="{SETTING_LINKS}" title="{LANG.no_jwp_lic_admin}"><strong>{LANG.no_jwp_lic_admin}</strong>&nbsp;<em class="fa fa-external-link"></em></a> </div>
+			<!-- END: no_jwp_lic_admin -->
+
+			<!-- BEGIN: no_jwp_lic -->
+			<div class="alert alert-warning"><strong>{LANG.no_jwp_lic}</strong></div>
+			<!-- END: no_jwp_lic -->
+
 			<div class="videoplayer">
 				<!-- BEGIN: vid_jw_content -->
 				<div id="videoCont">
-					<img src="{NV_BASE_SITEURL}themes/default/images/{MODULE_NAME}/loading.gif" class="center-block mar_rgt_auto img-responsive" alt="Loading player" />
+					<img src="{NV_BASE_SITEURL}themes/default/images/{MODULE_FILE}/loading.gif" class="center-block mar_rgt_auto img-responsive" alt="Loading player" />
 				</div>
 				<!-- END: vid_jw_content -->
 			</div>
@@ -175,16 +183,13 @@
 				<div class="thumbnail">
 					<!-- BEGIN: image -->
 					<a href="{RELATED_NEW.link}">
-						<img src="{RELATED_NEW.imghome}" <!-- BEGIN: fix_size --> style="height:{IMGHEIGHT}px;" <!-- END: fix_size --> class="related_video"/>
+						<img src="{RELATED_NEW.imghome}" style="width:{IMGWIDTH}px;height:{IMGHEIGHT}px;" class="related_video"/>
 					</a>
 					<!-- END: image -->
 					<h4>
 						<a href="{RELATED_NEW.link}">{RELATED_NEW.title}</a>
 					</h4>
 					<em>({RELATED_NEW.time})</em>
-					<!-- BEGIN: newday -->
-					<span class="icon_new">&nbsp;</span>
-					<!-- END: newday -->
 				</div>
 			</div>
 			<!-- END: loop -->
@@ -207,9 +212,6 @@
 						<a href="{RELATED.link}">{RELATED.title}</a>
 					</h4>
 					<em>({RELATED.time})</em>
-					<!-- BEGIN: newday -->
-					<span class="icon_new">&nbsp;</span>
-					<!-- END: newday -->
 				</div>
 			</div>
 			<!-- END: loop -->
@@ -219,7 +221,7 @@
 <!-- END: others -->
 
 <!-- BEGIN: jwplayer -->
-<script type="text/javascript" src="{NV_BASE_SITEURL}themes/default/modules/{MODULE_NAME}/jwplayer/jwplayer.js"></script>
+<script type="text/javascript" src="{NV_BASE_SITEURL}themes/default/modules/{MODULE_FILE}/jwplayer/jwplayer.js"></script>
 <script type="text/javascript">jwplayer.key="{VIDEO_CONFIG.jwplayer_license}";</script>
 <script type="text/javascript">
 var playerInstance = jwplayer("videoCont");
@@ -229,9 +231,9 @@ playerInstance.setup({
 	aspectratio: "16:9",
 	controls: {VIDEO_CONFIG.jwplayer_controlbar},
 	displaydescription: true,
-	playlist: "{NV_BASE_SITEURL}{MODULE_NAME}/player/{RAND_SS}{DETAIL.fake_pl_id}-{DETAIL.newscheckss}-{RAND_SS}{DETAIL.id}/",
+	playlist: "{NV_BASE_SITEURL}{MODULE_NAME}/player/{RAND_SS}{DETAIL.fake_pl_id}-{DETAIL.newscheckss}-{RAND_SS}{DETAIL.id}{EXT_URL}",
 	displaytitle: true,
-	flashplayer: "{NV_BASE_SITEURL}themes/default/modules/{MODULE_NAME}/jwplayer/jwplayer.flash.swf",
+	flashplayer: "{NV_BASE_SITEURL}themes/default/modules/{MODULE_FILE}/jwplayer/jwplayer.flash.swf",
 	primary: "html5",
 	repeat: {VIDEO_CONFIG.jwplayer_loop},
 	mute: {VIDEO_CONFIG.jwplayer_mute},

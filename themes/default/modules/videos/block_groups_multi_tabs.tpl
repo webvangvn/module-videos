@@ -15,6 +15,9 @@
 			<a href="{ROW.link}" title="{ROW.title}">{ROW.title}</a>
 		</li>
 		<!-- END: loop -->
+		<!-- BEGIN: no_loop -->
+			<div class="row">No Videos here</div>		
+		<!-- END: no_loop -->
 	</ul>
 <!-- END: group_content -->
 </div>

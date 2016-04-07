@@ -68,7 +68,7 @@ if( isset($user_info) and $user_info['userid'] > 0 )
 				}
 			}
 			nv_fix_playlist( $playlist_id );
-			nv_del_moduleCache( $module_name );
+			$nv_Cache->delMod( $module_name );
 		}
 		include NV_ROOTDIR . '/includes/header.php';
 		echo $content;
@@ -91,7 +91,7 @@ if( isset($user_info) and $user_info['userid'] > 0 )
 			$content = 'OK_' . $playlist_id;
 		}
 
-		nv_del_moduleCache( $module_name );
+		$nv_Cache->delMod( $module_name );
 
 		include NV_ROOTDIR . '/includes/header.php';
 		echo $content;
@@ -132,7 +132,7 @@ if( isset($user_info) and $user_info['userid'] > 0 )
 					$content = $lang_module['playlist_added_video'];
 				}
 			}
-			nv_del_moduleCache( $module_name );
+			$nv_Cache->delMod( $module_name );
 		}
 
 		include NV_ROOTDIR . '/includes/header.php';
@@ -152,7 +152,7 @@ if( isset($user_info) and $user_info['userid'] > 0 )
 				$query = "DELETE FROM " . NV_PREFIXLANG . "_" . $module_data . "_playlist WHERE playlist_id=" . $playlist_id;
 				$db->query( $query );
 				nv_fix_playlist_cat();
-				nv_del_moduleCache( $module_name );
+				$nv_Cache->delMod( $module_name );
 				$content = "OK_" . $playlist_id;
 			}
 		}
@@ -238,7 +238,7 @@ if( isset($user_info) and $user_info['userid'] > 0 )
 				}
 			}
 			nv_fix_playlist( $playlist_id );
-			nv_del_moduleCache( $module_name );
+			$nv_Cache->delMod( $module_name );
 			Header( 'Location: ' . NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&playlist_id=' . $playlist_id );
 			die();
 		}

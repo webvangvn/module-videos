@@ -184,12 +184,23 @@ while( list( $playlist_id,  $title_i ) = $result->fetch( 3 ) )
 $catid = $nv_Request->get_int( 'catid', 'get', 0 );
 $parentid = $nv_Request->get_int( 'parentid', 'get', 0 );
 
+$admin_name = '';
+if( !empty($admin_info['first_name']) OR !empty($admin_info['first_name'] ) )
+{
+	$admin_name = $admin_info['first_name'] . ' ' . $admin_info['last_name'];
+}
+else
+{
+	$admin_name = $admin_info['username'];
+}
+
+
 $rowcontent = array(
 	'id' => '',
 	'catid' => $catid,
 	'listcatid' => $catid . ',' . $parentid,
 	'admin_id' => $admin_id,
-	'admin_name' => $admin_info['username'],
+	'admin_name' => $admin_name,
 	'author' => '',
 	'artist' => '',
 	'sourceid' => 0,
@@ -204,6 +215,7 @@ $rowcontent = array(
 	'hometext' => '',
 	'sourcetext' => '',
 	'vid_path' => '',
+	'vid_duration' => '',
 	'homeimgfile' => '',
 	'homeimgalt' => '',
 	'homeimgthumb' => '',
@@ -478,6 +490,7 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 	$rowcontent['hometext'] = $nv_Request->get_textarea( 'hometext', '', 'br', 1 );
 
 	$rowcontent['vid_path'] = $nv_Request->get_title( 'vid_path', 'post', '' );
+	$rowcontent['vid_duration'] = $nv_Request->get_title( 'vid_duration', 'post', '' );
 	
 	$rowcontent['homeimgfile'] = $nv_Request->get_title( 'homeimg', 'post', '' );
 	$rowcontent['homeimgalt'] = $nv_Request->get_title( 'homeimgalt', 'post', '', 1 );
@@ -665,8 +678,15 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 		// Auto-Thumb from Youtube - if empty Image
 		if( ($rowcontent['vid_type'] == 2) AND ( empty($rowcontent['homeimgfile']) ) )
 		{
-			$rowcontent['homeimgfile'] = 'http://img.youtube.com/vi/' . get_youtube_id($rowcontent['vid_path']) . '/sddefault.jpg';
+			$rowcontent['homeimgfile'] = 'http://img.youtube.com/vi/' . get_youtube_id($rowcontent['vid_path']) . '/0.jpg';
 			$rowcontent['homeimgthumb'] = 3;
+		}
+		
+		// Auto-duration from Youtube - if empty 
+		if( ($rowcontent['vid_type'] == 2) AND ( empty($rowcontent['vid_duration']) ) )
+		{
+			$_vid_duration = youtubeVideoDuration($rowcontent['vid_path']);
+			$rowcontent['vid_duration'] = sec2hms($_vid_duration);
 		}
 
 		if( $rowcontent['id'] == 0 )
@@ -680,7 +700,7 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 				$rowcontent['status'] = 2;
 			}
 			$sql = 'INSERT INTO ' . NV_PREFIXLANG . '_' . $module_data . '_rows
-				(catid, listcatid, admin_id, admin_name, author, artist, sourceid, addtime, edittime, status, publtime, exptime, archive, title, alias, hometext, vid_path, vid_type, homeimgfile, homeimgalt, homeimgthumb, inhome, allowed_comm, allowed_rating, hitstotal, hitscm, total_rating, click_rating) VALUES
+				(catid, listcatid, admin_id, admin_name, author, artist, sourceid, addtime, edittime, status, publtime, exptime, archive, title, alias, hometext, vid_path, vid_duration, vid_type, homeimgfile, homeimgalt, homeimgthumb, inhome, allowed_comm, allowed_rating, hitstotal, hitscm, total_rating, click_rating) VALUES
 				 (' . intval( $rowcontent['catid'] ) . ',
 				 :listcatid,
 				 ' . intval( $rowcontent['admin_id'] ) . ',
@@ -698,6 +718,7 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 				 :alias,
 				 :hometext,
 				 :vid_path,
+				 :vid_duration,
 				 :vid_type,
 				 :homeimgfile,
 				 :homeimgalt,
@@ -719,6 +740,7 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 			$data_insert['alias'] = $rowcontent['alias'];
 			$data_insert['hometext'] = $rowcontent['hometext'];
 			$data_insert['vid_path'] = $rowcontent['vid_path'];
+			$data_insert['vid_duration'] = $rowcontent['vid_duration'];
 			$data_insert['vid_type'] = $rowcontent['vid_type'];
 			$data_insert['homeimgfile'] = $rowcontent['homeimgfile'];
 			$data_insert['homeimgalt'] = $rowcontent['homeimgalt'];
@@ -797,6 +819,7 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 					 alias=:alias,
 					 hometext=:hometext,
 					 vid_path=:vid_path,
+					 vid_duration=:vid_duration,
 					 vid_type=:vid_type,
 					 homeimgfile=:homeimgfile,
 					 homeimgalt=:homeimgalt,
@@ -814,6 +837,7 @@ if( $nv_Request->get_int( 'save', 'post' ) == 1 )
 			$sth->bindParam( ':alias', $rowcontent['alias'], PDO::PARAM_STR );
 			$sth->bindParam( ':hometext', $rowcontent['hometext'], PDO::PARAM_STR, strlen( $rowcontent['hometext'] ) );
 			$sth->bindParam( ':vid_path', $rowcontent['vid_path'], PDO::PARAM_STR );
+			$sth->bindParam( ':vid_duration', $rowcontent['vid_duration'], PDO::PARAM_STR );
 			$sth->bindParam( ':vid_type', $rowcontent['vid_type'], PDO::PARAM_STR );
 			$sth->bindParam( ':homeimgfile', $rowcontent['homeimgfile'], PDO::PARAM_STR );
 			$sth->bindParam( ':homeimgalt', $rowcontent['homeimgalt'], PDO::PARAM_STR );
@@ -1115,11 +1139,23 @@ foreach( $global_array_cat as $catid_i => $array_value )
 	if( ! empty( $check_show ) )
 	{
 		$space = intval( $array_value['lev'] ) * 30;
+		$xtitle_i = '';
+		$lev_i = $array_value['lev'];
+		if( $lev_i > 0 )
+		{
+			$xtitle_i .= '&nbsp;&nbsp;&nbsp;|';
+			for( $i = 1; $i <= $lev_i; ++$i )
+			{
+				$xtitle_i .= '---';
+			}
+			$xtitle_i .= '>&nbsp;';
+		}
+
 		$catiddisplay = ( sizeof( $array_catid_in_row ) > 1 and ( in_array( $catid_i, $array_catid_in_row ) ) ) ? '' : ' display: none;';
 		$temp = array(
 			'catid' => $catid_i,
 			'space' => $space,
-			'title' => $array_value['title'],
+			'title' => $xtitle_i . $array_value['title'],
 			'disabled' => ( ! in_array( $catid_i, $array_cat_check_content ) ) ? ' disabled="disabled"' : '',
 			'selected' => ( in_array( $catid_i, $array_catid_in_row ) ) ? ' selected="selected"' : '',
 			'catidchecked' => ( $catid_i == $rowcontent['catid'] ) ? ' selected="selected"' : '',
@@ -1281,6 +1317,10 @@ else
 if( empty( $rowcontent['alias'] ) )
 {
 	$xtpl->parse( 'main.getalias' );
+}
+if( empty( $rowcontent['vid_duration'] ) )
+{
+	$xtpl->parse( 'main.get_duration' );
 }
 $xtpl->assign( 'UPLOADS_DIR_USER', $uploads_dir_user );
 $xtpl->assign( 'UPLOADS_DIR_FILE_USER', $uploads_dir_file_user );

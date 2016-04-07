@@ -70,7 +70,7 @@ if( $nv_Request->isset_request( 'checkss,idcheck', 'post' ) and $nv_Request->get
 		}
 	}
 	nv_fix_playlist( $playlist_id );
-	nv_del_moduleCache( $module_name );
+	$nv_Cache->delMod( $module_name );
 	Header( 'Location: ' . NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op . '&playlist_id=' . $playlist_id );
 	die();
 }
@@ -97,7 +97,7 @@ if( $listid == '' and $playlist_id )
 }
 else
 {
-	$page_title = $lang_module['addtoplaylist'];
+	$page_title = $lang_module['addtoplaylists'];
 	$id_array = array_map( 'intval', explode( ',', $listid ) );
 
 	$db->sqlreset()->select( 'id, title' )->from( NV_PREFIXLANG . '_' . $module_data . '_rows' )->order( 'publtime DESC' )->where( 'status=1 AND id IN (' . implode( ',', $id_array ) . ')' );

@@ -196,7 +196,7 @@ else
 	
 		if( $homeimgthumb == 1 OR $homeimgthumb == 2 ) //image file
 		{
-			$img_src = creat_thumbs($id, $homeimgfile, $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+			$img_src = videos_thumbs($id, $homeimgfile, $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 		}
 		elseif( $homeimgthumb == 3 ) // image url
 		{

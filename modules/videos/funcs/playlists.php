@@ -104,7 +104,7 @@ if( !empty( $alias ) )
 		{
 			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['imghome'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['imghome'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 )//image url
 			{
@@ -154,7 +154,7 @@ else
 	{
 		if( ! empty( $item['image'] ) AND file_exists( NV_ROOTDIR. '/' . NV_UPLOADS_DIR . '/' . $module_upload . '/img/' . $item['image'] ) )//image file
 		{
-			$item['src'] = creat_thumbs($item['id'], $item['image'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+			$item['src'] = videos_thumbs($item['id'], $item['image'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 		}
 		elseif(nv_is_url($item['image']))
 		{
@@ -190,7 +190,6 @@ else
 		{
 			$playlist_array[] = $item;
 		}
-	
 	}
 	$result->closeCursor();
 	unset( $result, $row );

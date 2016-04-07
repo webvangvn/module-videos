@@ -16,18 +16,26 @@
 </div>
 <!-- END: playlist_info -->
 
+<!-- BEGIN: no_jwp_lic_admin -->
+<div class="clear alert alert-warning"><a href="{SETTING_LINKS}" title="{LANG.no_jwp_lic_admin}"><strong>{LANG.no_jwp_lic_admin}</strong>&nbsp;<em class="fa fa-external-link"></em></a> </div>
+<!-- END: no_jwp_lic_admin -->
+
+<!-- BEGIN: no_jwp_lic -->
+<div class="clear alert alert-warning"><strong>{LANG.no_jwp_lic}</strong></div>
+<!-- END: no_jwp_lic -->
+
 <!-- BEGIN: player -->
 <div class="detail_video margin-bottom-lg margin-top-lg col-xs-24 col-md-24 col-lg-24">
 	<div class="videoplayer">
 		<div id="videoCont">
-			<img src="{NV_BASE_SITEURL}themes/default/images/{MODULE_NAME}/loading.gif" class="center-block" alt="Loading player" />
+			<img src="{NV_BASE_SITEURL}themes/default/images/{MODULE_FILE}/loading.gif" class="center-block" alt="Loading player" />
 		</div>
 		<div class="PlaylistCont margin-top-lg">
 			<div id="show-list"></div>
 		</div>
 	</div>
 </div>
-<script type="text/javascript" src="{NV_BASE_SITEURL}themes/default/modules/{MODULE_NAME}/jwplayer/jwplayer.js"></script>
+<script type="text/javascript" src="{NV_BASE_SITEURL}themes/default/modules/{MODULE_FILE}/jwplayer/jwplayer.js"></script>
 <script type="text/javascript">jwplayer.key="{VIDEO_CONFIG.jwplayer_license}";</script>
 <script type="text/javascript">
 var playerInstance = jwplayer("videoCont");
@@ -35,11 +43,11 @@ playerInstance.setup({
 	image: "{PLAYLIST_IMAGE}",
 	autostart: {VIDEO_CONFIG.jwplayer_autoplay},
 	aspectratio: "16:9",
-	playlist : "{NV_BASE_SITEURL}{MODULE_NAME}/player/{RAND_SS}{PLAYLIST_ID}-{PLIST_CHECKSS}-{RAND_SS}{FAKE_ID}/",
+	playlist : "{NV_BASE_SITEURL}{MODULE_NAME}/player/{RAND_SS}{PLAYLIST_ID}-{PLIST_CHECKSS}-{RAND_SS}{FAKE_ID}{EXT_URL}",
 	controls: {VIDEO_CONFIG.jwplayer_controlbar},
 	displaydescription: true,
 	displaytitle: true,
-	flashplayer: "{NV_BASE_SITEURL}themes/default/modules/{MODULE_NAME}/jwplayer/jwplayer.flash.swf",
+	flashplayer: "{NV_BASE_SITEURL}themes/default/modules/{MODULE_FILE}/jwplayer/jwplayer.flash.swf",
 	primary: "html5",
 	repeat: {VIDEO_CONFIG.jwplayer_loop},
 	mute: {VIDEO_CONFIG.jwplayer_mute},
@@ -122,12 +130,16 @@ function playThis(index) {
 		<!-- END: homethumb -->
 		<div class="videos-thumbnail pull-left col-md-18 col-lg-18 col-xs-18">
 			<h3><a href="{PLAYLIST_LOOP.link}" title="{PLAYLIST_LOOP.title}">{PLAYLIST_LOOP.title}</a></h3>
+			<!-- BEGIN: num_items -->
 			<p>
 				{LANG.playlist_num_videos}&nbsp;:&nbsp;{PLAYLIST_LOOP.num_items}&nbsp;{LANG.video}
 			</p>
+			<!-- END: num_items -->
+			<!-- BEGIN: publtime -->
 			<p>
 				{LANG.create_date}&nbsp;:&nbsp;{DATE}
 			</p>
+			<!-- END: publtime -->
 			<p class="text-justify">
 				{PLAYLIST_LOOP.hometext}
 			</p>

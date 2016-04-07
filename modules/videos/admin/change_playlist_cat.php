@@ -62,7 +62,7 @@ elseif( $mod == 'numlinks' and $new_vid >= 0 and $new_vid <= 50 )
 	$content = 'OK_' . $playlist_id;
 }
 
-nv_del_moduleCache( $module_name );
+$nv_Cache->delMod( $module_name );
 
 include NV_ROOTDIR . '/includes/header.php';
 echo $content;

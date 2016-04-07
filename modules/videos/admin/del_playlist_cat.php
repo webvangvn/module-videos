@@ -23,7 +23,7 @@ if( $playlist_id > 0 )
 		$query = "DELETE FROM " . NV_PREFIXLANG . "_" . $module_data . "_playlist WHERE playlist_id=" . $playlist_id;
 		$db->query( $query );
 		nv_fix_playlist_cat();
-		nv_del_moduleCache( $module_name );
+		$nv_Cache->delMod( $module_name );
 		$contents = "OK_" . $playlist_id;
 	}
 }

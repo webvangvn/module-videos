@@ -113,7 +113,7 @@ if( $catid > 0 )
 						$db->query( "DELETE FROM " . NV_PREFIXLANG . "_" . $module_data . "_admins WHERE catid=" . $catid );
 
 						nv_fix_cat_order();
-						nv_del_moduleCache( $module_name );
+						$nv_Cache->delMod( $module_name );
 						Header( 'Location: ' . NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=cat&parentid=' . $parentid );
 						die();
 					}
@@ -160,7 +160,7 @@ if( $catid > 0 )
 							$db->query( "DELETE FROM " . NV_PREFIXLANG . "_" . $module_data . "_admins WHERE catid=" . $catid );
 
 							nv_fix_cat_order();
-							nv_del_moduleCache( $module_name );
+							$nv_Cache->delMod( $module_name );
 							Header( 'Location: ' . NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=cat&parentid=' . $parentid );
 							die();
 						}
@@ -185,7 +185,7 @@ if( $catid > 0 )
 					$contents = "OK_" . $parentid;
 				}
 				$db->query( "DELETE FROM " . NV_PREFIXLANG . "_" . $module_data . "_admins WHERE catid=" . $catid );
-				nv_del_moduleCache( $module_name );
+				$nv_Cache->delMod( $module_name );
 			}
 			else
 			{

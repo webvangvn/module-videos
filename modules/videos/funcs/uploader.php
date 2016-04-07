@@ -10,7 +10,11 @@
 
 if( ! defined( 'NV_IS_MOD_VIDEOS' ) ) die( 'Stop!!!' );
 
-$alias = $array_op[1];
+$array_page = explode( '-', $array_op[1] );
+$uploader_id = intval( end( $array_page ) );
+$number = strlen( $uploader_id ) + 1;
+$alias = substr( $array_op[1], 0, -$number );
+
 if( isset( $array_op[2] ) )
 {
 	if( sizeof( $array_op ) == 3 and preg_match( '/^page\-([0-9]+)$/', $array_op[2], $m ) )
@@ -23,34 +27,49 @@ if( isset( $array_op[2] ) )
 	}
 }
 
-$page_title = $lang_module['uploaded_by'] . trim( str_replace( '-', ' ', $alias ) );
+$u_info = array();
+$db->sqlreset()
+	->select( 'userid, username, first_name, last_name' )
+	->from( NV_USERS_GLOBALTABLE  )
+	->where( 'userid=' . $uploader_id );
+	$result = $db->query( $db->sql() );
+	while( $uploader_info = $result->fetch() )
+	{
+		if(!empty($uploader_info))
+		{
+			if ( !empty($uploader_info['first_name']) OR !empty($uploader_info['last_name']) )
+			{
+				$uploader_info['uploader_name'] = $uploader_info['first_name'] . ' ' . $uploader_info['last_name'];
+			}
+			else
+			{
+				$uploader_info['uploader_name'] = $uploader_info['username'];
+			}
+		}
+		else
+		{
+			$alias = trim( str_replace( '-', ' ', $alias ) );
+			$uploader_info['uploader_name'] = $alias;
+		}
+		$u_info = $uploader_info;
+	}
+
 $show_no_image = $module_config[$module_name]['show_no_image'];
 if(empty($show_no_image))
 {
 	$show_no_image = 'themes/default/images/' . $module_name . '/' . 'video_placeholder.png';
 }
 
-if( ! empty( $page_title ) and $page_title == strip_punctuation( $page_title ) )
+if( ! empty( $alias ) and ! empty( $uploader_id ) )
 {
-	$base_url = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $alias;
-	if( $page > 1 )
-	{
-		$page_title .= ' ' . NV_TITLEBAR_DEFIS . ' ' . $lang_global['page'] . ' ' . $page;
-	}
-
-	$array_mod_title[] = array(
-		'catid' => 0,
-		'title' => $page_title,
-		'link' => $base_url
-	);
-
 	$item_array = array();
 	$end_publtime = 0;
+	$alias = $db->dblikeescape( nv_htmlspecialchars( $alias ) );
 
 	$db->sqlreset()
 		->select( 'COUNT(*)' )
 		->from( NV_PREFIXLANG . '_' . $module_data . '_rows' )
-		->where( 'status=1 AND admin_name = ' . $db->quote( $alias ) );
+		->where( 'status=1 AND admin_id=' . $uploader_id );
 	
 	$num_items = $db->query( $db->sql() )->fetchColumn();
 	$description = $num_items . $lang_module['playlist_num_news'];
@@ -66,7 +85,7 @@ if( ! empty( $page_title ) and $page_title == strip_punctuation( $page_title ) )
 		{
 			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['src'] = creat_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
+				$item['src'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 ) //image url
 			{
@@ -92,8 +111,19 @@ if( ! empty( $page_title ) and $page_title == strip_punctuation( $page_title ) )
 		$result->closeCursor();
 		unset( $query, $row );
 
-		$generate_page = nv_alias_page( $page_title, $base_url, $num_items, $per_page, $page );
+		$page_title = $lang_module['uploaded_by'] . ' ' . $u_info['uploader_name'];
+		$base_url = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=uploader/' . $alias . $uploader_id;
+		if( $page > 1 )
+		{
+			$page_title .= ' ' . NV_TITLEBAR_DEFIS . ' ' . $lang_global['page'] . ' ' . $page;
+		}
 
+		$array_mod_title[] = array(
+			'catid' => 0,
+			'title' => $page_title,
+			'link' => $base_url
+		);
+		$generate_page = nv_alias_page( $page_title, $base_url, $num_items, $per_page, $page );
 		$contents = tag_theme( $item_array, $generate_page, $page_title, $description, '' );
 
 		if( $page > 1 )

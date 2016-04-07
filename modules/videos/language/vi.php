@@ -17,6 +17,8 @@ $lang_translator['copyright'] = '@Copyright (C) 2012 VINADES.,JSC. All rights re
 $lang_translator['info'] = '';
 $lang_translator['langtype'] = 'lang_module';
 
+$lang_module['no_jwp_lic_admin'] = 'Chưa cấu hình License JWplayer';
+$lang_module['no_jwp_lic'] = 'Trình phát bị lỗi. Vui lòng liên hệ với quản trị trang để được hỗ trợ.';
 $lang_module['nocatpage'] = 'Lỗi không có chủ đề';
 $lang_module['other'] = 'Các tin khác';
 $lang_module['detail'] = 'Chi tiết tin';
@@ -186,13 +188,14 @@ $lang_module['playlist_num_videos'] = 'Video trong Playlist';
 
 $lang_module['userpl_disable'] = 'Chức năng thêm/sửa Playlist đã bị tắt';
 $lang_module['user_create_newlist'] = 'Cần tạo mới Playlist';
-$lang_module['user_required'] = 'Đăng ký hoặc đăng nhập để dùng chức năng này';
+$lang_module['user_required'] = 'Đăng ký hoặc đăng nhập để dùng chức năng Yêu thích Video';
 
 $lang_module['video_favorite'] = 'Thích video này';
 $lang_module['video_more_text'] = 'Mở rộng';
 $lang_module['video_less_text'] = 'Thu gọn';
 
 $lang_module['error_vid_path'] = 'Liên kết Video thiếu hoặc sai quy định';
+$lang_module['videos_duration'] = 'Thời lượng';
 
 $lang_module['year'] = 'năm trước';
 $lang_module['month'] = 'tháng trước';
@@ -209,3 +212,4 @@ $lang_module['hits_view'] = ' Lượt xem';
 $lang_module['guest_post'] = 'Khách vãng lai';
 $lang_module['uploaded_by'] = 'Video upload bởi ';
 $lang_module['create_date'] = 'Ngày tạo';
+$lang_module['groups_show_list'] = 'Danh sách Thể loại';

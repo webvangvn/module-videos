@@ -243,12 +243,7 @@ function viewsubcat_main( $viewcat, $array_cat )
 				$xtpl->assign( 'CONTENT', $array_row_i );
 
 				if( $array_row_i['imghome'] != "" )
-				{
-					if(!($array_row_i['homeimgthumb'] > 0))
-					{
-						$xtpl->parse( 'main.listcat.loop.image.fix_size' );
-					}
-					
+				{				
 					$xtpl->assign( 'HOMEIMG', $array_row_i['imghome'] );
 					$xtpl->assign( 'HOMEIMGALT', ! empty( $array_row_i['homeimgalt'] ) ? $array_row_i['homeimgalt'] : $array_row_i['title'] );
 					$xtpl->parse( 'main.listcat.loop.image' );
@@ -295,6 +290,7 @@ function detail_theme( $news_contents, $href_vid, $array_keyword, $related_new_a
 	$xtpl->assign( 'TEMPLATE', $global_config['module_theme'] );
 	$xtpl->assign( 'MODULE_NAME', $module_name );
 	$xtpl->assign( 'LANG', $lang_module );
+	$xtpl->assign( 'MODULE_FILE', $module_file );
 	
 	$xtpl->assign( 'IMGWIDTH', $module_config[$module_name]['homewidth'] );
 	$xtpl->assign( 'IMGHEIGHT', $module_config[$module_name]['homeheight'] );
@@ -303,11 +299,20 @@ function detail_theme( $news_contents, $href_vid, $array_keyword, $related_new_a
 	$news_contents['publtime'] = humanTiming(  $news_contents['publtime'] );
 
 	$xtpl->assign( 'RAND_SS', rand(1000,9999) );
+	$xtpl->assign( 'EXT_URL', $global_config['rewrite_endurl'] );
 	$xtpl->assign( 'NEWSID', $news_contents['id'] );
 	$xtpl->assign( 'NEWSCHECKSS', $news_contents['newscheckss'] );
 	$xtpl->assign( 'DETAIL', $news_contents );
 	$xtpl->assign( 'SELFURL', $client_info['selfurl'] );
 	$xtpl->assign( 'USERLIST_OPS',  $module_info['alias']['user-playlist'] );
+	
+	if( defined( 'NV_IS_MODADMIN' ) AND (empty($module_config[$module_name]['jwplayer_license']) OR !isset($module_config[$module_name]['jwplayer_license']) ) ){
+		$xtpl->assign( 'SETTING_LINKS',  NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=setting#jwplayer_license' );
+		$xtpl->parse( 'main.no_jwp_lic_admin' );
+	}elseif( empty($module_config[$module_name]['jwplayer_license']) OR !isset($module_config[$module_name]['jwplayer_license']) ){
+		$xtpl->parse( 'main.no_jwp_lic' );
+	}
+
 	if( !empty($module_config[$module_name]['jwplayer_logo_file']) and file_exists( NV_ROOTDIR .'/'. $module_config[$module_name]['jwplayer_logo_file'] ) )
 	{
 		$lu = strlen( NV_BASE_SITEURL );
@@ -446,10 +451,6 @@ function detail_theme( $news_contents, $href_vid, $array_keyword, $related_new_a
 				$xtpl->assign( 'RELATED_NEW', $related_new_array_i );
 				if( $related_new_array_i['imghome'] != '' )
 				{
-					if(!($related_new_array_i['homeimgthumb'] > 0))
-					{
-						$xtpl->parse( 'main.others.related_new.loop.image.fix_size' );
-					}
 					$xtpl->parse( 'main.others.related_new.loop.image' );
 				}
 				$xtpl->parse( 'main.others.related_new.loop' );
@@ -495,7 +496,7 @@ function detail_theme( $news_contents, $href_vid, $array_keyword, $related_new_a
 		}
 		$xtpl->parse( 'main.user_playlist' );
 	}
-	elseif( $user_info['userid'] > 0 )
+	elseif( isset($user_info['userid']) AND $user_info['userid'] > 0 )
 	{
 		$xtpl->parse( 'main.user_create_newlist' );
 	}
@@ -532,12 +533,14 @@ function no_permission()
 
 function playlist_theme( $playlist_array, $playlist_other_array, $generate_page, $playlist_info, $playlist_id, $pl_ss )
 {
-	global $lang_module, $module_info, $module_name, $module_file, $playlistalias, $module_config, $user_info;
+	global $global_config, $lang_module, $module_info, $module_name, $module_file, $playlistalias, $module_config, $user_info;
 
 	$xtpl = new XTemplate( 'playlist.tpl', NV_ROOTDIR . '/themes/' . $module_info['template'] . '/modules/' . $module_file );
 	$xtpl->assign( 'LANG', $lang_module );
 	$xtpl->assign( 'RAND_SS', rand(1000,9999) );
+	$xtpl->assign( 'EXT_URL', $global_config['rewrite_endurl'] );
 	$xtpl->assign( 'MODULE_NAME', $module_name );
+	$xtpl->assign( 'MODULE_FILE', $module_file );
 	$xtpl->assign( 'PLAYLIST_ID', $playlist_id );
 	$xtpl->assign( 'FAKE_ID', 0 );
 	$xtpl->assign( 'PLIST_CHECKSS', $pl_ss);
@@ -548,7 +551,7 @@ function playlist_theme( $playlist_array, $playlist_other_array, $generate_page,
 		$lu = strlen( NV_BASE_SITEURL );
 		$module_config[$module_name]['jwplayer_logo_file'] = NV_BASE_SITEURL . $module_config[$module_name]['jwplayer_logo_file'];
 	}
-
+		
 	$xtpl->assign( 'VIDEO_CONFIG', $module_config[$module_name] );
 
 	if( ! empty( $playlist_info ) )
@@ -583,6 +586,12 @@ function playlist_theme( $playlist_array, $playlist_other_array, $generate_page,
 			{
 				if( $playlist_info['private_mode'] != 1 OR $playlist_info['userid'] == $user_info['userid']) // playlist is NOT private 
 				{
+					if( empty($module_config[$module_name]['jwplayer_license']) AND defined( 'NV_IS_MODADMIN' ) ){
+						$xtpl->assign( 'SETTING_LINKS',  NV_BASE_ADMINURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module_name . '&amp;' . NV_OP_VARIABLE . '=setting#jwplayer_license' );
+						$xtpl->parse( 'main.no_jwp_lic_admin' );
+					}elseif( empty($module_config[$module_name]['jwplayer_license']) OR !isset($module_config[$module_name]['jwplayer_license']) ){
+						$xtpl->parse( 'main.no_jwp_lic' );
+					}
 					if(  $module_config[$module_name]['jwplayer_logo'] > 0 and !empty($module_config[$module_name]['jwplayer_logo_file']))
 					{				
 						$xtpl->parse( 'main.player.player_logo' );
@@ -604,8 +613,17 @@ function playlist_theme( $playlist_array, $playlist_other_array, $generate_page,
 			foreach( $playlist_array as $playlist_array_i )
 			{
 				$xtpl->assign( 'PLAYLIST_LOOP', $playlist_array_i );
-				$xtpl->assign( 'DATE', date( 'd/m/Y', $playlist_array_i['publtime'] ) );
+				if($playlist_array_i['publtime'] > 0)
+				{
+					$xtpl->assign( 'DATE', date( 'd/m/Y', $playlist_array_i['publtime'] ) );
+					$xtpl->parse( 'main.playlist_loop.publtime' );
+				}
 
+				if( ! empty( $playlist_array_i['num_items'] ) )
+				{
+					$xtpl->parse( 'main.playlist_loop.num_items' );
+				}
+				
 				if( ! empty( $playlist_array_i['src'] ) )
 				{
 					$xtpl->parse( 'main.playlist_loop.homethumb' );

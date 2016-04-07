@@ -1,7 +1,7 @@
 <?php
 
 /**
-* @Project NUKEVIET 4
+* @Project NUKEVIET 4.x
 * @Author VINADES.,JSC (contact@vinades.vn)
 * @Copyright (C) 2015 VINADES.,JSC. All rights reserved
 * @Language English
@@ -9,7 +9,7 @@
 * @Createdate Apr 15, 2011, 08:22:00 AM
 */
 
-if( ! defined( 'NV_MAINFILE' ) ) die( 'Stop!!!' );
+if( ! defined( 'NV_ADMIN' ) or ! defined( 'NV_MAINFILE' ) ) die( 'Stop!!!' );
 
 $lang_translator['author'] = 'VINADES.,JSC (contact@vinades.vn)';
 $lang_translator['createdate'] = '15/04/2011, 15:22';
@@ -25,5 +25,3 @@ $lang_block['tooltip_position_bottom'] = 'Bottom';
 $lang_block['tooltip_position_left'] = 'Left';
 $lang_block['tooltip_position_right'] = 'Right';
 $lang_block['tooltip_length'] = 'Length character';
-
-?>

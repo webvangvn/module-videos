@@ -143,14 +143,34 @@ if( ! $array_post_user['addcontent'] )
 	include NV_ROOTDIR . '/includes/footer.php';
 }
 
-if( $nv_Request->isset_request( 'get_content_alias', 'post' ) )
+if( $nv_Request->isset_request( 'get_alias', 'post' ) )
 {
-	$title = $nv_Request->get_title( 'get_content_alias', 'post', '' );
+	$title = $nv_Request->get_title( 'get_alias', 'post', '' );
 	$alias = change_alias( $title );
 	$alias = strtolower( $alias );
 
 	include NV_ROOTDIR . '/includes/header.php';
 	echo $alias;
+	include NV_ROOTDIR . '/includes/footer.php';
+}
+
+if( $nv_Request->isset_request( 'get_duration', 'post' ) )
+{
+	$path = $nv_Request->get_string( 'get_duration', 'post', '' );
+	$mod = $nv_Request->get_string( 'mod', 'post', '' );
+	$path = urldecode($path);
+	if( !empty($path) AND is_youtube($path) )
+	{
+		$_vid_duration = youtubeVideoDuration($path);
+		$duration = sec2hms($_vid_duration);
+	}
+	else
+	{
+		$duration = '';
+	}
+
+	include NV_ROOTDIR . '/includes/header.php';
+	echo $duration;
 	include NV_ROOTDIR . '/includes/footer.php';
 }
 
@@ -180,7 +200,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 
 			if( $rowcontent_old['status'] == 1 )
 			{
-				nv_del_moduleCache( $module_name );
+				$nv_Cache->delMod( $module_name );
 			}
 
 			Header( 'Location: ' . nv_url_rewrite( NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $op, true ) );
@@ -204,13 +224,26 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 		'title' => $lang_module['add_content'],
 		'link' => $base_url
 	);
-
+	
+	$admin_name = '';
+	if(defined( 'NV_IS_USER' ))
+	{
+		if( !empty($user_info['first_name']) OR !empty($user_info['first_name'] ) )
+		{
+			$admin_name = $user_info['first_name'] . ' ' . $user_info['last_name'];
+		}
+		else
+		{
+			$admin_name = $user_info['username'];
+		}
+	}
+	
 	$rowcontent = array(
 		'id' => '',
 		'listcatid' => '',
 		'catid' => ( $contentid > 0 ) ? $rowcontent_old['catid'] : 0,
 		'admin_id' => ( defined( 'NV_IS_USER' ) ) ? $user_info['userid'] : 1, // Anonymous videos will be moderated by Admin.
-		'admin_name' => ( defined( 'NV_IS_USER' ) ) ? $user_info['username'] : $lang_module['guest_post'],
+		'admin_name' => ( defined( 'NV_IS_USER' ) ) ? $admin_name : $lang_module['guest_post'],
 		'author' => '',
 		'artist' => '',
 		'sourceid' => 0,
@@ -223,6 +256,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 		'title' => '',
 		'alias' => '',
 		'vid_path' => '',
+		'vid_duration' => '',
 		'vid_type' => '',
 		'hometext' => '',
 		'homeimgfile' => '',
@@ -273,31 +307,25 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 
 		$rowcontent['hometext'] = $nv_Request->get_title( 'hometext', 'post', '' );
 		$rowcontent['vid_path'] = $nv_Request->get_title( 'vid_path', 'post', '' );
+		$rowcontent['vid_duration'] = $nv_Request->get_title( 'vid_duration', 'post', '' );
 		$rowcontent['homeimgfile'] = $nv_Request->get_title( 'homeimgfile', 'post', '' );
 		$rowcontent['homeimgalt'] = $nv_Request->get_title( 'homeimgalt', 'post', '', 1 );
 		$rowcontent['sourcetext'] = $nv_Request->get_title( 'sourcetext', 'post', '' );
 
 		// Xu ly Video link
 		$rowcontent['vid_type'] = 0;
-		if( nv_is_url( $rowcontent['vid_path'] ) )
+		if(is_youtube($rowcontent['vid_path']))
 		{
-			if(is_youtube($rowcontent['vid_path']))
-			{
-				$rowcontent['vid_type'] = 2; //is Youtube
-			}
-			elseif( is_picasa($rowcontent['vid_path']) )
-			{
-				$rowcontent['vid_type'] = 3; //is Picasa
-			}
-			else
-			{
-				$rowcontent['vid_path'] = ''; //return blank
-				$rowcontent['vid_type'] = ''; //return blank
-			}
+			$rowcontent['vid_type'] = 2; //is Youtube
+		}
+		elseif( is_picasa($rowcontent['vid_path']) )
+		{
+			$rowcontent['vid_type'] = 3; //is Picasa
 		}
 		else
 		{
-			$rowcontent['vid_path'] = '';
+			$rowcontent['vid_path'] = ''; //return blank
+			$rowcontent['vid_type'] = ''; //return blank
 		}
 
 		// Xu ly anh minh hoa
@@ -311,7 +339,21 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 			$rowcontent['homeimgfile'] = '';
 			$rowcontent['homeimgthumb'] = 0;
 		}
-
+		
+		// Auto-Thumb from Youtube - if empty Image
+		if( ($rowcontent['vid_type'] == 2) AND ( empty($rowcontent['homeimgfile']) ) )
+		{
+			$rowcontent['homeimgfile'] = 'http://img.youtube.com/vi/' . get_youtube_id($rowcontent['vid_path']) . '/0.jpg';
+			$rowcontent['homeimgthumb'] = 3;
+		}
+		
+		// Auto-duration from Youtube - if empty 
+		if( ($rowcontent['vid_type'] == 2) AND ( empty($rowcontent['vid_duration']) ) )
+		{
+			$_vid_duration = youtubeVideoDuration($rowcontent['vid_path']);
+			$rowcontent['vid_duration'] = sec2hms($_vid_duration);
+		}
+		
 		$bodyhtml = $nv_Request->get_string( 'bodyhtml', 'post', '' );
 		$rowcontent['bodyhtml'] = defined( 'NV_EDITOR' ) ? nv_nl2br( $bodyhtml, '' ) : nv_nl2br( nv_htmlspecialchars( strip_tags( $bodyhtml ) ), '<br />' );
 
@@ -363,7 +405,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 			if( $rowcontent['id'] == 0 )
 			{
 				$_sql = "INSERT INTO " . NV_PREFIXLANG . "_" . $module_data . "_rows
-						(catid, listcatid, admin_id, admin_name, author, artist, sourceid, addtime, edittime, status, publtime, exptime, archive, title, alias, hometext, vid_path, vid_type, homeimgfile, homeimgalt, homeimgthumb, inhome, allowed_comm, allowed_rating, hitstotal, hitscm, total_rating, click_rating) VALUES
+						(catid, listcatid, admin_id, admin_name, author, artist, sourceid, addtime, edittime, status, publtime, exptime, archive, title, alias, hometext, vid_path, vid_duration, vid_type, homeimgfile, homeimgalt, homeimgthumb, inhome, allowed_comm, allowed_rating, hitstotal, hitscm, total_rating, click_rating) VALUES
 						 (" . intval( $rowcontent['catid'] ) . ",
 						 " . $db->quote( $rowcontent['listcatid'] ) . ",
 						 " . intval( $rowcontent['admin_id'] ) . ",
@@ -381,6 +423,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 						 " . $db->quote( $rowcontent['alias'] ) . ",
 						 " . $db->quote( $rowcontent['hometext'] ) . ",
 						 " . $db->quote( $rowcontent['vid_path'] ) . ",
+						 " . $db->quote( $rowcontent['vid_duration'] ) . ",
 						 " . intval( $rowcontent['vid_type'] ) . ",
 						 " . $db->quote( $rowcontent['homeimgfile'] ) . ",
 						 " . $db->quote( $rowcontent['homeimgalt'] ) . ",
@@ -442,6 +485,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 						 title=" . $db->quote( $rowcontent['title'] ) . ",
 						 alias=" . $db->quote( $rowcontent['alias'] ) . ",
 						 vid_path=" . $db->quote( $rowcontent['vid_path'] ) . ",
+						 vid_duration=" . $db->quote( $rowcontent['vid_duration'] ) . ",
  						 vid_type=" . intval( $rowcontent['vid_type'] ) . ",
 						 hometext=" . $db->quote( $rowcontent['hometext'] ) . ",
 						 homeimgfile=" . $db->quote( $rowcontent['homeimgfile'] ) . ",
@@ -500,7 +544,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 					if( $rowcontent['status'] )
 					{
 						$array_temp['content'] = $lang_module['save_content_ok'];
-						nv_del_moduleCache( $module_name );
+						$nv_Cache->delMod( $module_name );
 					}
 					else
 					{
@@ -512,7 +556,7 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 					$catid = $catids[0];
 					$array_temp['urlrefresh'] = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&' . NV_NAME_VARIABLE . '=' . $module_name . '&' . NV_OP_VARIABLE . '=' . $global_array_cat[$catid]['alias'] . '/' . $rowcontent['alias'] . '-' . $rowcontent['id'];
 					$array_temp['content'] = $lang_module['save_content_view_page'];
-					nv_del_moduleCache( $module_name );
+					$nv_Cache->delMod( $module_name );
 				}
 				else
 				{
@@ -639,7 +683,16 @@ if( $nv_Request->isset_request( 'contentid', 'get,post' ) and $fcheckss == $chec
 	{
 		$contents .= "<script type=\"text/javascript\">\n";
 		$contents .= '$("#idtitle").change(function () {
- 		get_content_alias();
+ 		get_alias();
+		});';
+		$contents .= "</script>\n";
+	}
+	
+	if( empty( $rowcontent['vid_duration'] ) )
+	{
+		$contents .= "<script type=\"text/javascript\">\n";
+		$contents .= '$("#vid_path").change(function () {
+ 		get_duration();
 		});';
 		$contents .= "</script>\n";
 	}
@@ -665,7 +718,7 @@ elseif( defined( 'NV_IS_USER' ) )
 	$num_items = $db->query( $db->sql() )->fetchColumn();
 	if( $num_items )
 	{
-		$db->select( 'id, catid, listcatid, admin_id, admin_name, author, artist, sourceid, addtime, edittime, status, publtime, title, alias, hometext, vid_path, homeimgfile, homeimgalt, homeimgthumb, allowed_rating, hitstotal, hitscm, total_rating, click_rating' )
+		$db->select( 'id, catid, listcatid, admin_id, admin_name, author, artist, sourceid, addtime, edittime, status, publtime, title, alias, hometext, vid_path, vid_duration, homeimgfile, homeimgalt, homeimgthumb, allowed_rating, hitstotal, hitscm, total_rating, click_rating' )
 			->order( 'id DESC' )
 			->limit( $per_page )
 			->offset( ( $page - 1 ) * $per_page );
@@ -673,13 +726,9 @@ elseif( defined( 'NV_IS_USER' ) )
 		$result = $db->query( $db->sql() );
 		while( $item = $result->fetch() )
 		{
-			if( $item['homeimgthumb'] == 1 ) // image thumb
+			if( $item['homeimgthumb'] == 1 OR $item['homeimgthumb'] == 2 ) //image file
 			{
-				$item['imghome'] = NV_BASE_SITEURL . NV_FILES_DIR . '/' . $module_upload . '/' . $item['homeimgfile'];
-			}
-			elseif( $item['homeimgthumb'] == 2 ) // image file
-			{
-				$item['imghome'] = NV_BASE_SITEURL . NV_UPLOADS_DIR . '/' . $module_upload . '/' . $item['homeimgfile'];
+				$item['imghome'] = videos_thumbs($item['id'], $item['homeimgfile'], $module_upload, $module_config[$module_name]['homewidth'], $module_config[$module_name]['homeheight'], 90 );
 			}
 			elseif( $item['homeimgthumb'] == 3 ) // image url
 			{
@@ -687,7 +736,7 @@ elseif( defined( 'NV_IS_USER' ) )
 			}
 			else // no image
 			{
-				$item['imghome'] = NV_BASE_SITEURL . 'themes/' . $global_config['site_theme'] . '/images/no_image.gif';
+				$item['imghome'] = NV_BASE_SITEURL .  'themes/default/images/' . $module_name . '/' . 'video_placeholder.png';
 			}
 
 			$item['is_edit_content'] = ( empty( $item['status'] ) or $array_post_user['editcontent'] ) ? 1 : 0;
@@ -695,6 +744,7 @@ elseif( defined( 'NV_IS_USER' ) )
 
 			$catid = $item['catid'];
 			$item['link'] = $global_array_cat[$catid]['link'] . '/' . $item['alias'] . '-' . $item['id'] . $global_config['rewrite_exturl'];
+			$item['title_cut'] = nv_clean60( $item['title'], $module_config[$module_name]['titlecut'], true );
 			$array_catpage[] = $item;
 		}
 

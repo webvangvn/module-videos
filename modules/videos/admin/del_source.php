@@ -44,7 +44,7 @@ if( $sourceid > 0 )
 		}
 	}	
 	nv_fix_source();
-	nv_del_moduleCache( $module_name );
+	$nv_Cache->delMod( $module_name );
 	$contents = 'OK_' . $sourceid;
 }
 

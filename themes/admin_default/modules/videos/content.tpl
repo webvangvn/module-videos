@@ -90,6 +90,7 @@
 						<td>
 							<input class="form-control" style="width:380px" type="text" name="vid_path" id="vid_path" placeholder="{LANG.videos_sources_placeholder}" value="{rowcontent.vid_path}"/>
 							<input id="select-video" type="button" value="{LANG.browse_server}" name="selectvid" class="btn btn-info" />
+							<span>{LANG.videos_duration}: </span><input class="form-control" style="width:100px" type="text" name="vid_duration" id="vid_duration" placeholder="00:00:00" value="{rowcontent.vid_duration}"/>&nbsp; <em class="fa fa-refresh fa-lg fa-pointer" onclick="get_duration();">&nbsp;</em>
 						</td>
 					</tr>
 					<tr>
@@ -105,8 +106,8 @@
 			<table class="table table-striped table-bordered table-hover">
 				<div id="content_hometext" >
 				<strong>{LANG.content_hometext}</strong>
-					<i>{LANG.content_notehome}.</i> {GLANG.length_characters}: <span id="descriptionlength" class="red">0</span>. {GLANG.description_suggest_max} 
-					<textarea id="description" name="hometext" rows="5" cols="75" style="font-size:14px; width: 100%; height:150px;" class="form-control">{rowcontent.hometext}</textarea>
+					<i>{LANG.content_notehome}.</i> {GLANG.length_characters}: <span id="descriptionlength" class="red">0</span>. 
+					<textarea id="description" name="hometext" rows="5" cols="75" style="font-size:14px; width: 100%; height:100px;margin-bottom:15px;" class="form-control">{rowcontent.hometext}</textarea>
 				</div>
 				<div id="content_bodytext" >
 				<strong>{LANG.content_bodytext}</strong>
@@ -296,6 +297,13 @@ $("#idtitle").change(function() {
 	get_alias();
 });
 <!-- END: getalias -->
+
+<!-- BEGIN: get_duration -->
+$("#vid_path").change(function() {
+	get_duration();
+});
+<!-- END: get_duration -->
+
 //]]>
 </script>
 <script type="text/javascript" src="{NV_BASE_SITEURL}{NV_ASSETS_DIR}/js/ui/jquery.ui.core.min.js"></script>
